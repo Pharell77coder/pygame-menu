@@ -1,173 +1,68 @@
-import pygame, sys
+import pygame
+from constants import *
 
-FPS = 60
 
-
-class Game:
-    def __init__(self):
-        # Initialisation de Pygame
+class Menu:
+    def __init__(self, screen, font, root):
         pygame.init()
+        self.screen = screen
+        self.font = font
 
-        # Variables pour la taille de l'écran
-        self.screen_width = 640
-        self.screen_height = 480
-
-        # Initialisation de la fenêtre
-        self.full_screen = False
-        if self.full_screen:
-            self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), pygame.FULLSCREEN)
-        elif not self.full_screen:
-            self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        self.clock = pygame.time.Clock()
-        pygame.display.set_caption('Projets-001')
-
-        # Couleurs utilisées dans le jeu
-        self.white = (255, 255, 255)
-        self.black = (0, 0, 0)
-        self.red = (255, 0, 0)
-
-        self.speed = 5
-
-        # Initialisation du texte
-        pygame.font.init()
-        self.font = pygame.font.SysFont("Arial", 24)
-
-        # Variables pour le menu d'accueil
-        self.menu_options = ["Commencer une Partie", "Progression", "Paramètres", "Quitter"]
-        self.partie_options = ["Tutoriel", "Local", "En ligne", "Retour"]
-        self.options_options = ["Pleine écran", "Volume", "Retour"]
-        self._options = [""]
+        self.index = 0
         self.selected_option = 0
-        self.state = "menu"
+        self.menu_options = (("Commencer une Partie", "Paramètres", "Quitter"),
+                             ("Grille", "Retour"),
+                             ("Pleine écran", "Retour"))
+        self.root = root
 
-        # Son du jeu
-        # sound = pygame.mixer.Sound('../audio/main.ogg')
-        # sound.set_volume(0.5)
-        # sound.play(loops=-1)
+    def handling(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                self.selected_option = (self.selected_option - 1) % len(self.menu_options[self.index])
+            elif event.key == pygame.K_DOWN:
+                self.selected_option = (self.selected_option + 1) % len(self.menu_options[self.index])
 
-    # Fonction pour dessiner les boutons
-    def draw_button(self, text, x, y, width, height, inactive_color, active_color):
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
-        if x + width > mouse[0] > x and y + height > mouse[1] > y:
-            pygame.draw.rect(self.screen, active_color, (x, y, width, height))
-            if click[0] == 1:
-                return True
-        else:
-            pygame.draw.rect(self.screen, inactive_color, (x, y, width, height))
-            text_surface = self.font.render(text, True, self.black)
-            text_rect = text_surface.get_rect()
-            text_rect.center = (x + width / 2, y + height / 2)
-            self.screen.blit(text_surface, text_rect)
+            elif event.key == pygame.K_RETURN:
+                if self.index == 0:
+                    if self.menu_options[self.index][self.selected_option] == "Commencer une Partie":
+                        self.index = 1
+                    elif self.menu_options[self.index][self.selected_option] == "Paramètres":
+                        self.index = 2
+                    elif self.menu_options[self.index][self.selected_option] == "Quitter":
+                        self.root.running = False
 
-            return False
+                elif self.index == 1:
+                    if self.menu_options[self.index][self.selected_option] == "Grille":
+                        self.root.state = "grille"
+                    elif self.menu_options[self.index][self.selected_option] == "Retour":
+                        self.index = 0
 
-    def draw(self, options):
-        for i, option in enumerate(options):
-            x = (self.screen_width // 2) - 200
-            y = (self.screen_height // 5) + (i * 75)
+                elif self.index == 2:
+                    if self.menu_options[self.index][self.selected_option] == "Pleine écran":
+                        if self.root.full_screen:
+                            self.root.screen = pygame.display.set_mode((HEIGHT, WIDTH), pygame.FULLSCREEN)
+                        elif not self.root.full_screen:
+                            self.root.screen = pygame.display.set_mode((HEIGHT, WIDTH))
+                    elif self.menu_options[self.index][self.selected_option] == "Retour":
+                        self.index = 0
+
+    def draw(self):
+        self.screen.fill((230, 250, 240))
+        for i, option in enumerate(self.menu_options[self.index]):
+            x = (WIDTH // 2) - 200
+            y = (HEIGHT // 5) + (i * 75)
             inactive_color = (150, 150, 150)
             active_color = (200, 200, 200)
             color = inactive_color
+            if option == "Quitter":
+                color = (255, 0, 0)
             if i == self.selected_option:
                 color = active_color
+            if option == "Quitter" and i == self.selected_option:
+                color = (255, 100, 100)
             menu_text = self.font.render(option, True, color)
             menu_rect = menu_text.get_rect(center=(x, y))
             self.screen.blit(menu_text, menu_rect)
 
-    def state_options(self):
-        if self.state == "menu":
-            options = self.menu_options
-        elif self.state == "partie":
-            options = self.partie_options
-        elif self.state == "options":
-            options = self.options_options
-        else:
-            options = [""]
-        return options
 
-    def run(self):
-        # Boucle principale du jeu
-        running = True
-        while running:
-
-            if self.full_screen:
-                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height), pygame.FULLSCREEN)
-            elif not self.full_screen:
-                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.KEYDOWN:
-                    options = self.state_options()
-                    if event.key == pygame.K_UP:
-                        self.selected_option = (self.selected_option - 1) % len(options)
-                    elif event.key == pygame.K_DOWN:
-                        self.selected_option = (self.selected_option + 1) % len(options)
-                    elif event.key == pygame.K_RETURN:
-
-                        if self.state == "menu":
-                            if self.menu_options[self.selected_option] == "Commencer une Partie":
-                                self.state = "partie"
-                            elif self.menu_options[self.selected_option] == "Progression":
-                                print('plus tard')
-                            elif self.menu_options[self.selected_option] == "Paramètres":
-                                self.state = "options"
-                            elif self.menu_options[self.selected_option] == "Quitter":
-                                running = False
-                            else:
-                                print('erreur menu')
-
-                        elif self.state == "partie":
-                            if self.partie_options[self.selected_option] == "Tutoriel":
-                                self.state = "tutorial"
-                            elif self.partie_options[self.selected_option] == "Local":
-                                print('plus tard')
-                            elif self.partie_options[self.selected_option] == "En ligne":
-                                print('plus tard')
-                            elif self.partie_options[self.selected_option] == "Retour":
-                                self.state = "menu"
-                            else:
-                                print('erreur partie')
-
-                        elif self.state == "options":
-                            if self.options_options[self.selected_option] == "Pleine écran":
-                                self.full_screen = not self.full_screen
-                            elif self.options_options[self.selected_option] == "Retour":
-                                self.state = "menu"
-                            elif self.options_options[self.selected_option] == "Volume":
-                                print('plus tard')
-                            else:
-                                print('erreur options')
-
-                        print(self.state, self.menu_options[self.selected_option], self.partie_options[self.selected_option])
-
-            self.screen.fill(self.white)
-
-            if self.state == "menu":
-                self.draw(self.menu_options)
-
-            elif self.state == "partie":
-                self.draw(self.partie_options)
-
-            elif self.state == "options":
-                self.draw(self.options_options)
-
-            elif self.state == "tutorial":
-                pass
-
-            else:
-                print("state no-defined")
-
-            pygame.display.update()
-            self.clock.tick(FPS)
-
-def main():
-    game = Game()
-    game.run()
-    pygame.quit()
-    sys.exit()
-
-if __name__ == '__main__':
-    main()
+# Tests
