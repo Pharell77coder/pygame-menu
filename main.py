@@ -15,7 +15,7 @@ class Game:
         self.current_time = 0
         self.button_press_time = 0
         self.press = True
-        self.state = "grille"
+        self.state = "menu"
         self.running = True
         self.full_screen = False
 
