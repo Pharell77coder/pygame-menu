@@ -11,16 +11,14 @@ class Game:
         self.screen = pygame.display.set_mode((HEIGHT, WIDTH))
         self.clock = pygame.time.Clock()
         pygame.display.set_caption("Un Titre")
-        pygame.font.init()
-        self.font = pygame.font.SysFont("arial.ttk", 24)
         self.current_time = 0
         self.button_press_time = 0
         self.press = True
         self.state = "grille" #"menu"
         self.running = True
         self.full_screen = False
-        self.menu = Menu(self.screen, self.font, self)
-        self.grille = Grid(self.screen, self.font, self)
+        self.menu = Menu(self.screen, self)
+        self.grille = Grid(self.screen, self)
 
     def run(self):
         self.running = True
@@ -40,6 +38,7 @@ class Game:
             if self.state == "menu":
                 self.menu.draw()
             elif self.state == "grille":
+                self.grille.update()
                 self.grille.draw()
 
             self.current_time = pygame.time.get_ticks()

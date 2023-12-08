@@ -3,10 +3,11 @@ from constants import *
 
 
 class Menu:
-    def __init__(self, screen, font, root):
+    def __init__(self, screen, root):
         pygame.init()
         self.screen = screen
-        self.font = font
+        pygame.font.init()
+        self.font = pygame.font.SysFont("arial.ttk", 24)
 
         self.index = 0
         self.selected_option = 0
