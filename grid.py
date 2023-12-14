@@ -9,6 +9,7 @@ class Square:
     def __init__(self, pos, owner):
         self.x = pos[0]
         self.y = pos[1]
+        self.pos = pos
         self.margin = 0.5
 
         self.border = 'black'
@@ -30,6 +31,8 @@ class Square:
         self.economie = 0
         pygame.font.init()
         self.font = pygame.font.SysFont("arial.ttk", 13)
+        self.claim = [owner.province]
+        self.id_claim = [owner]
 
     def get_pos(self):
         return self.x, self.y
@@ -54,7 +57,7 @@ class Square:
             screen.blit(menu_text, menu_rect)
 
     def update(self):
-        self.population = self.population * random.uniform(0.9, 1.1) + 1
+        self.population = self.population * random.uniform(0.9, 1.1)
         self.population = int(self.population)
         self.garnison = self.population * (self.owner.lois['conscription'] / 100)
         self.garnison = int(self.garnison)
@@ -134,6 +137,25 @@ class Grid:
         days_rect = days_text.get_rect(top=0, right=HEIGHT - len(texte))
         self.screen.blit(days_text, days_rect)
 
+        texte = f"{info[6].province}"
+        days1_text = self.font.render(texte, True, 'black')
+        days1_rect = days1_text.get_rect(top=32, right=HEIGHT - 10)
+        self.screen.blit(days1_text, days1_rect)
+
+        texte = f"En guerre: "
+        days1_text = self.font.render(texte, True, 'black')
+        days1_rect = days1_text.get_rect(top=64, right=HEIGHT - 10)
+        self.screen.blit(days1_text, days1_rect)
+
+        for i in range(len(info[6].ennemies)):
+            texte = f"{info[6].ennemies[i].province}"
+            days1_text = self.font.render(texte, True, 'black')
+            days1_rect = days1_text.get_rect(top=96+(32*i), right=HEIGHT - 10)
+            self.screen.blit(days1_text, days1_rect)
     def update(self):
         for entity in self.entities:
             entity.update()
+            entity.update_frontier(self.map)
+            n = random.randint(0, 10000)
+            if n == 100 and len(entity.ennemies) == 0:
+                entity.at_war()

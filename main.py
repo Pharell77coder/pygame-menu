@@ -14,14 +14,14 @@ class Game:
         self.current_time = 0
         self.button_press_time = 0
         self.press = True
-        self.state = "menu"
+        self.state = "grille"#"menu"
         self.running = True
         self.full_screen = False
         self.menu = Menu(self.screen, self)
         self.grille = Grid(self.screen, self)
 
     def run(self):
-        date = [1, 0, 1, 0] # jour mois années heures
+        date = [1, 0, 1] # jour mois années
         self.running = True
         while self.running:
             for event in pygame.event.get():
@@ -41,16 +41,14 @@ class Game:
             elif self.state == "grille":
                 self.grille.update()
                 self.grille.draw(date)
+                date[0] += 1
                 if date[0] == 29:
                     date[0] = 1
                     date[1] += 1
                 if date[1] == 13:
                     date[1] = 0
                     date[2] += 1
-                if date[3] == 24:
-                    date[3] = 0
-                    date[0] += 1
-                date[3] += 1
+
 
             self.current_time = pygame.time.get_ticks()
             if self.current_time - self.button_press_time > 10:
