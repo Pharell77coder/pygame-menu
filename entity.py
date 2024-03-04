@@ -14,11 +14,12 @@ class Entity:
         self.population = 0
         self.ressource = {"electricite": 0, "port": 0, "petrole": 0}
         self.economie = 0
-        self.lois = {'taxe': 1.50, 'conscription': 5}
+        self.lois = {'taxe': 1.50, 'conscription': 25}
         self.ennemies = []
         self.allies = []
         self.armies = []
         self.voisin = []
+
 
     def update_frontier(self, liste):
         self.voisin = []
@@ -43,17 +44,20 @@ class Entity:
         self.garnison = 0
         self.population = 0
         self.economie = 0
-
+        self.effectif = 0
         for area in self.territoire:
             communiste += area.ideologie['communiste']
             liberal += area.ideologie['liberal']
             fasciste += area.ideologie['fasciste']
             self.garnison += area.garnison
+            self.effectif += area.effectif
             self.population += area.population
-            self.economie += area.economie - self.population - self.garnison * 10
+            self.economie += area.economie - self.population - self.garnison * 10 - self.effectif * 10
         self.economie = round(self.economie, 2)
         self.ideologie = {"communiste": communiste//len(self.territoire), "liberal": liberal//len(self.territoire), "fasciste": fasciste//len(self.territoire)}
         self.ressource = {"electricite": 0, "port": 0, "petrole": 0}
+
+
 
     def get_population(self):
         return self.population

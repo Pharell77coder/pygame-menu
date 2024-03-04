@@ -28,5 +28,5 @@ def pathfinding(pos, target):
     return liste
 
 pos = (random.randint(0, 10), random.randint(0, 10))
-target = (random.randint(0, 10), random.randint(0, 10))
+target = (random.randint(10, 20), random.randint(10, 20))
 print(f"Position de départ : {pos}, Position d'arrivée : {target}, trajet : {pathfinding(pos, target)}")

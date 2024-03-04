@@ -17,20 +17,21 @@ class Square:
 
         eng = ['bury', 'burgh', 'by', 'cester', 'ford', 'ham', 'mouth', 'stead', 'ton', 'worth']
         fra = ['court', 'ville', 'heim', 'loire', 'ac', 'a', 'o', 'mer']
-        self.province = str(names.get_last_name()) + random.choice(eng)
+        self.province = str(names.get_last_name()) + random.choice(fra)
 
         c = random.randint(0, 100)
         l = random.randint(0, 100 - c)
         f = 100 - (c + l)
         self.ideologie = {"communiste": c, "liberal": l, "fasciste": f}
 
-        self.garnison = random.randint(100, 1000)
+        self.garnison = 0
+        self.effectif = 0
         self.population = random.randint(1000, 10000)
         self.ressource = {"electricite": random.randint(0, 100), "port": random.randint(0, 100),
                           "petrole": random.randint(0, 100)}
         self.economie = 0
         pygame.font.init()
-        self.font = pygame.font.SysFont("arial.ttk", 13)
+        self.font = pygame.font.SysFont("arial.ttk", 14)
         self.claim = [owner.province]
         self.id_claim = [owner]
 
@@ -59,8 +60,11 @@ class Square:
     def update(self):
         self.population = self.population * random.uniform(0.9, 1.1)
         self.population = int(self.population)
-        self.garnison = self.population * (self.owner.lois['conscription'] / 100)
+        self.garnison = self.population / 100
         self.garnison = int(self.garnison)
+        self.effectif = self.population * (self.owner.lois['conscription'] / 100)
+        self.effectif = int(self.effectif)
+        self.civil = self.population - (self.effectif + self.garnison)
         self.economie += self.population * self.owner.lois['taxe']
 
 
@@ -111,11 +115,13 @@ class Grid:
         for case in self.map:
             if date[0] == 1:
                 case.update()
+            case.draw(self.screen, False)
+
+        for case in self.map:
             if case.get_pos() == click_pos:
                 case.draw(self.screen, True)
                 info = case.get_info()
-            else:
-                case.draw(self.screen, False)
+
         pygame.draw.rect(self.screen, 'white', (1, HEIGHT_FIRST - TILESIZE * 2 + 1, WIDTH - 1, TILESIZE * 2 - 2))
         pygame.draw.rect(self.screen, 'white', (HEIGHT_FIRST + 1, 1, TILESIZE * 4 - 2, WIDTH - 2))
         self.texte(f"Nom de La province : {info[0]} - {info[6].province}", (0, 525))
@@ -141,8 +147,8 @@ class Grid:
         days1_text = self.font.render(texte, True, 'black')
         days1_rect = days1_text.get_rect(top=32, right=HEIGHT - 10)
         self.screen.blit(days1_text, days1_rect)
-
-        texte = f"En guerre: "
+        texte = "En guerre : "
+        if len(info[6].ennemies) == 0: texte ="En paix"
         days1_text = self.font.render(texte, True, 'black')
         days1_rect = days1_text.get_rect(top=64, right=HEIGHT - 10)
         self.screen.blit(days1_text, days1_rect)

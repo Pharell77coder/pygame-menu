@@ -12,7 +12,7 @@ class Menu:
         self.index = 0
         self.selected_option = 0
         self.menu_options = (("Commencer une Partie", "Paramètres", "Quitter"),
-                             ("Grille", "Retour"),
+                             ("Grille", "RPG", "Retour"),
                              ("Pleine écran", "Retour"))
         self.root = root
 
@@ -35,6 +35,8 @@ class Menu:
                 elif self.index == 1:
                     if self.menu_options[self.index][self.selected_option] == "Grille":
                         self.root.state = "grille"
+                    elif self.menu_options[self.index][self.selected_option] == "RPG":
+                         self.root.state = "rpg"
                     elif self.menu_options[self.index][self.selected_option] == "Retour":
                         self.index = 0
 
